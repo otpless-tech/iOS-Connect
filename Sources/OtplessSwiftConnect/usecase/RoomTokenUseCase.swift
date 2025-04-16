@@ -9,16 +9,33 @@ import Foundation
 
 class RoomTokenUseCase {
     private let apiRepository: ApiRepository
+    private var retryCount = 0
     
     init (apiRepository: ApiRepository) {
         self.apiRepository = apiRepository
     }
     
-    func invoke(appId: String, secret: String) async -> String? {
+    func invoke(appId: String, secret: String, isRetry: Bool) async -> String? {
+        if !isRetry {
+            retryCount = 0
+        }
+        
+        if retryCount >= 2 {
+            return nil
+        }
+        
         let roomTokenRequestBody = RoomTokenRequestBody(appId: appId)
-        return await apiRepository.getRoomRequestToken(body: roomTokenRequestBody.toDict(), headers: [
-            "secret": secret
-        ])
+        if let token = await apiRepository.getRoomRequestToken(
+            body: roomTokenRequestBody.toDict(),
+            headers: [
+                "secret": secret
+            ]
+        ) {
+            return token
+        }
+        
+        retryCount += 1
+        return await invoke(appId: appId, secret: secret, isRetry: true)
     }
 }
 
@@ -40,3 +57,4 @@ private struct RoomTokenRequestBody: Codable, Sendable {
         return [:]
     }
 }
+

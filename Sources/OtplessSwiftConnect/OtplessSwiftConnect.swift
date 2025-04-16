@@ -46,8 +46,8 @@ public class OtplessSwiftConnect: NSObject, URLSessionDelegate {
         self.secret = secret
         
         Task(priority: .medium, operation: { [weak self] in
-            self?.roomRequestToken = await self?.roomTokenUseCase.invoke(appId: appId, secret: secret) ?? ""
-            self?.roomRequestId = await self?.roomIdUseCase.invoke(token: self?.roomRequestToken ?? "") ?? ""
+            self?.roomRequestToken = await self?.roomTokenUseCase.invoke(appId: appId, secret: secret, isRetry: false) ?? ""
+            self?.roomRequestId = await self?.roomIdUseCase.invoke(token: self?.roomRequestToken ?? "", isRetry: false) ?? ""
             
             guard let self = self else {
                 DispatchQueue.main.async {
