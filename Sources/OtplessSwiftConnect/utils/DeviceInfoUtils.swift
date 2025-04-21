@@ -119,7 +119,7 @@ class DeviceInfoUtils : @unchecked Sendable {
             params["tsid"] = tsid
         }
         
-        params["sdkVersion"] = "1.0.0"
+        params["sdkVersion"] = "1.0.1"
         
         params["osVersion"] = os.majorVersion.description + "." + os.minorVersion.description
         params["hasWhatsapp"] = hasWhatsApp.description

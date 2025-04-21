@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = 'OtplessSwiftConnect'
-    s.version          = '1.0.0'
+    s.version          = '1.0.1'
     s.summary          = 'A Swift SDK for integrating Otpless Pre Build UI.'
   
     s.description      = <<-DESC

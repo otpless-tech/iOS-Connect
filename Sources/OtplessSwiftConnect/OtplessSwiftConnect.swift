@@ -100,6 +100,7 @@ public class OtplessSwiftConnect: NSObject, URLSessionDelegate {
         var params: [String: Any] = [:]
         params["otpless_connect_id"] = roomRequestId
         params["v"] = 5
+        params["otpl_instl_wa"] = DeviceInfoUtils.shared.hasWhatsApp
         return params
     }
     
