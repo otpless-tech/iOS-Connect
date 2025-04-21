@@ -26,6 +26,7 @@ public class OtplessSwiftConnect: NSObject, URLSessionDelegate {
     private var shouldLog = false
     
     public static let shared: OtplessSwiftConnect = {
+        DeviceInfoUtils.shared.initialise()
         return OtplessSwiftConnect()
     }()
     
@@ -101,6 +102,8 @@ public class OtplessSwiftConnect: NSObject, URLSessionDelegate {
         params["otpless_connect_id"] = roomRequestId
         params["v"] = 5
         params["otpl_instl_wa"] = DeviceInfoUtils.shared.hasWhatsApp
+        params["otpl_sdk_type"] = "connect"
+        params["otpl_platform"] = "iOS"
         return params
     }
     
