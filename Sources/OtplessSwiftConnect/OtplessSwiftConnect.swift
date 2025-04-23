@@ -85,6 +85,13 @@ public class OtplessSwiftConnect: NSObject, URLSessionDelegate {
             }
         }
         
+        socket.on(clientEvent: .error) { [weak self] data, ack in
+            sendEvent(event: .SOCKET_ERROR, extras: ["error": Utils.jsonParamString(from: data) ?? "Unknown error or error could not be parsed from Socket"])
+            if self?.shouldLog == true {
+                print("OtplessConnect: Socket error: \(data)")
+            }
+        }
+        
         socket.on("message") { [weak self] (data, ack) in
             if let parsedEvent = SocketEventParser.parseEvent(from: data) {
                 sendEvent(event: .SOCKET_MESSAGE_RECEIVED, extras: ["messageId": parsedEvent.messageId])

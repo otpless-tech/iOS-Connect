@@ -81,4 +81,5 @@ enum EventConstants: String {
     case SOCKET_CONNECTION_FAILURE = "native_connectsdk_socket_connection_failure"
     case SOCKET_DISCONNECTED = "native_connectsdk__socket_disconnected"
     case SOCKET_MESSAGE_RECEIVED = "native_connectsdk_socket_message"
+    case SOCKET_ERROR = "native_connectsdk_socket_error"
 }
