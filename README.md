@@ -37,7 +37,7 @@ SDK can be installed via both Cocoapods and Swift Package Manager.
 - Add the following line into the dependencies section of your project's `Podfile`:
 
 ```ruby
-pod 'OtplessSwiftConnect', '1.0.0'
+pod 'OtplessSwiftConnect', '1.0.1'
 ```
 
 
@@ -52,7 +52,7 @@ pod install
 #### Swift Package Manager
 1. In Xcode, click File > Swift Packages > Add Package Dependency.
 2. In the dialog that appears, enter the repository URL: https://github.com/otpless-tech/iOS-Connect.git.
-3. Select the dependency rule as `exact version` and use the version `1.0.0`.
+3. Select the dependency rule as `exact version` and use the version `1.0.1`.
 
 ---
 

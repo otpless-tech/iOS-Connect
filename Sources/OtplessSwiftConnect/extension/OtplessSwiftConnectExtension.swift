@@ -35,6 +35,7 @@ extension OtplessSwiftConnect {
     func startSNA(requestURLString urlString: String) {
         self.apiRepository.performSNA(requestURL: urlString, completion: { [weak self] result in
             self?.sendSocketMessage(eventName: AppEventType.responseOnCellularData.rawValue, eventValue: result)
+            sendEvent(event: .SNA_CALLBACK_RESULT, extras: ["sna_response": Utils.convertDictionaryToString(result)])
         })
     }
     

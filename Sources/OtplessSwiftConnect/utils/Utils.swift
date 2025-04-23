@@ -95,54 +95,31 @@ final internal class Utils {
         }
         return nil
     }
-//    
-//    static func convertToEventParamsJson(
-//        otplessResponse: OtplessResponse?,
-//        callback: @escaping (
-//            [String: String],
-//            _ requestId: String?,
-//            _ musId: String?
-//        ) -> Void
-//    ) {
-//        var eventParam = [String: String]()
-//        var requestId: String? = nil
-//        var musId: String? = nil
-//        
-//        var response = [String: String]()
-//        
-//        if otplessResponse == nil {
-//            response["statusCode"] = "-1"
-//            response["responseType"] = "null"
-//            response["response"] = "{}"
-//            callback(response, nil, nil)
-//            return
-//        }
-//        
-//        response["statusCode"] = "\(otplessResponse?.statusCode ?? -1)"
-//        response["responseType"] = otplessResponse?.responseType.rawValue ?? "null"
-//        
-//        if otplessResponse?.statusCode != 200 {
-//            if let responseBody = otplessResponse?.response {
-//                response["response"] = "\(responseBody)"
-//            } else {
-//                response["response"] = "{}"
-//            }
-//        } else {
-//            if let dataJson = otplessResponse?.response?["data"] as? [String: Any] {
-//                requestId = dataJson["token"] as? String
-//                musId = dataJson["userId"] as? String
-//            } else {
-//                response["response"] = "{}"
-//            }
-//        }
-//        
-//        // Convert response dictionary to JSON string
-//        if let jsonData = try? JSONSerialization.data(withJSONObject: response, options: []),
-//           let jsonString = String(data: jsonData, encoding: .utf8) {
-//            eventParam["response"] = jsonString
-//        }
-//        
-//        callback(eventParam, requestId, musId)
-//    }
+
+    /// Serialize any JSON‑compatible object into a URL‑encoded string.
+    /// - Parameter object: An object that `JSONSerialization` can convert (Array, Dictionary, etc.)
+    /// - Returns: A URL‑encoded JSON string, or `nil` if serialization fails.
+    static func jsonParamString(from object: Any) -> String? {
+        guard JSONSerialization.isValidJSONObject(object) else {
+            return nil
+        }
+
+        do {
+            let data = try JSONSerialization.data(withJSONObject: object, options: [])
+            guard let jsonString = String(data: data, encoding: .utf8) else {
+                return nil
+            }
+            return jsonString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
+        } catch {
+            return nil
+        }
+    }
     
+    static func otplessLog(_ message: String) {
+        #if DEBUG
+            if OtplessSwiftConnect.shared.shouldLog {
+                print("OtplessSwiftConnect: \(message)")
+            }
+        #endif
+    }
 }

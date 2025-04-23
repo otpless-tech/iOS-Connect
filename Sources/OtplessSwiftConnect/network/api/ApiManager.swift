@@ -42,14 +42,10 @@ class ApiManager {
             
             return data
         } catch {
+            sendEvent(event: EventConstants.ERROR_API_RESPONSE, extras: ["user_auth_api_error": error.localizedDescription, "which_api": path])
             if let apiError = error as? ApiError {
-//                sendEvent(event: .ERROR_API_RESPONSE, extras: apiError.getResponse())
                 throw apiError
             } else {
-//                sendEvent(event: .ERROR_API_RESPONSE, extras: [
-//                    "errorCode": "500",
-//                    "errorMessage": error.localizedDescription
-//                ])
                 throw ApiError(
                     message: error.localizedDescription,
                     statusCode: 500,
@@ -93,14 +89,10 @@ class ApiManager {
             
             return data
         } catch {
+            sendEvent(event: EventConstants.ERROR_API_RESPONSE, extras: ["connect_api_error": error.localizedDescription, "which_api": path])
             if let apiError = error as? ApiError {
-//                sendEvent(event: .ERROR_API_RESPONSE, extras: apiError.getResponse())
                 throw apiError
             } else {
-//                sendEvent(event: .ERROR_API_RESPONSE, extras: [
-//                    "errorCode": "500",
-//                    "errorMessage": error.localizedDescription
-//                ])
                 throw ApiError(
                     message: error.localizedDescription,
                     statusCode: 500,
