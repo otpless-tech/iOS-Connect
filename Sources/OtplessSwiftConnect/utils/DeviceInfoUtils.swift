@@ -20,7 +20,6 @@ class DeviceInfoUtils : @unchecked Sendable {
     public var isIntialised = false
     public var hasWhatsApp : Bool = false
     public var hasGmailInstalled : Bool = false
-    public var hasOTPLESSInstalled : Bool = false
     public var appHash = ""
     private var inid: String?
     private var tsid: String?
@@ -31,7 +30,6 @@ class DeviceInfoUtils : @unchecked Sendable {
         if (!isIntialised){
             hasWhatsApp = isWhatsappInstalled()
             hasGmailInstalled = isGmailInstalled()
-            hasOTPLESSInstalled = isOTPLESSInstalled()
             appHash = getAppHash() ?? "noapphash"
             isIntialised = true
             generateTrackingId()
@@ -64,13 +62,6 @@ class DeviceInfoUtils : @unchecked Sendable {
     
     func isGmailInstalled() -> Bool{
         if UIApplication.shared.canOpenURL(URL(string: "googlegmail://")! as URL) {
-            return true
-        } else {
-            return false
-        }
-    }
-    func isOTPLESSInstalled() -> Bool{
-        if (UIApplication.shared.canOpenURL(URL(string: "com.otpless.ios.app.otpless://")! as URL)){
             return true
         } else {
             return false
@@ -123,7 +114,6 @@ class DeviceInfoUtils : @unchecked Sendable {
         
         params["osVersion"] = os.majorVersion.description + "." + os.minorVersion.description
         params["hasWhatsapp"] = hasWhatsApp.description
-        params["hasOtplessApp"] = hasOTPLESSInstalled.description
         params["hasGmailApp"] = hasGmailInstalled.description
         params["packageName"] = packageName
         params["platform"] = "iOS-Connect"

@@ -42,6 +42,7 @@ class ApiManager {
             
             return data
         } catch {
+            sendEvent(event: EventConstants.ERROR_API_RESPONSE, extras: ["error": error.localizedDescription])
             if let apiError = error as? ApiError {
                 throw apiError
             } else {
