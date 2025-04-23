@@ -8,7 +8,7 @@
 import Foundation
 import Network
 
-func sendEvent(event: EventConstants, extras: [String: String] = [:], token: String = ""){
+func sendEvent(event: EventConstants, extras: [String: String] = [:]){
     do {
         var params = [String: String]()
         params["event_name"] = event.rawValue
@@ -20,10 +20,6 @@ func sendEvent(event: EventConstants, extras: [String: String] = [:], token: Str
         params["tsid"] = DeviceInfoUtils.shared.getTrackingSessionId()
         params["inid"] = DeviceInfoUtils.shared.getInstallationId()
         params["event_id"] = String(OtplessSwiftConnect.shared.getEventCounterAndIncrement())
-        
-        if !token.isEmpty {
-            params["token"] = token
-        }
         
         if let eventParamsData = try? JSONSerialization.data(withJSONObject: extras, options: []),
            let eventParamsString = String(data: eventParamsData, encoding: .utf8) {

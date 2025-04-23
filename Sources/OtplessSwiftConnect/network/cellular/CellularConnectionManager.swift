@@ -52,7 +52,7 @@ final class CellularConnectionManager: @unchecked Sendable {
             return
         }
         
-        print("Connection timeout is \(CONNECTION_TIME_OUT)")
+        Utils.otplessLog("Connection timeout is \(CONNECTION_TIME_OUT)")
         
         // This closure will be called on main thread
         checkResponseHandler = { [weak self] (response) -> Void in
@@ -285,11 +285,11 @@ final class CellularConnectionManager: @unchecked Sendable {
     func createTimer() {
         
         if let timer = self.timer, timer.isValid {
-            os_log("Invalidating the existing timer", type: .debug)
+            Utils.otplessLog("Invalidating the existing timer")
             timer.invalidate()
         }
         
-        os_log("Starting a new timer", type: .debug)
+        Utils.otplessLog("Starting a new timer")
         self.timer = Timer.scheduledTimer(timeInterval: self.CONNECTION_TIME_OUT,
                                           target: self,
                                           selector: #selector(self.fireTimer),
@@ -312,17 +312,17 @@ final class CellularConnectionManager: @unchecked Sendable {
             for interfaceType in interfaceTypes {
                 switch interfaceType {
                 case .wifi:
-                    print("Path is Wi-Fi")
+                    Utils.otplessLog("Path is Wi-Fi")
                 case .cellular:
-                    print("Path is Cellular ipv4 \(path.supportsIPv4.description) ipv6 \(path.supportsIPv6.description)")
+                    Utils.otplessLog("Path is Cellular ipv4 \(path.supportsIPv4.description) ipv6 \(path.supportsIPv6.description)")
                 case .wiredEthernet:
-                    print("Path is Wired Ethernet")
+                    Utils.otplessLog("Path is Wired Ethernet")
                 case .loopback:
-                    print("Path is Loopback")
+                    Utils.otplessLog("Path is Loopback")
                 case .other:
-                    print("Path is other")
+                    Utils.otplessLog("Path is other")
                 default:
-                    print("Path is unknown")
+                    Utils.otplessLog("Path is unknown")
                 }
             }
         }
@@ -365,7 +365,7 @@ final class CellularConnectionManager: @unchecked Sendable {
             // All connection events will be delivered on the main thread.
             connection.start(queue: .main)
         } else {
-            os_log("Problem creating a connection ", url.absoluteString)
+            Utils.otplessLog("Problem creating a connection")
             completion(.err(NetworkError.connectionCantBeCreated("Problem creating a connection \(url.absoluteString)")))
         }
     }
@@ -373,7 +373,7 @@ final class CellularConnectionManager: @unchecked Sendable {
     func sendAndReceiveWithBody(requestUrl: URL, data: Data, completion: @escaping ResultHandler) {
         connection?.send(content: data, completion: NWConnection.SendCompletion.contentProcessed({ (error) in
             if let err = error {
-                os_log("Sending error %s", type: .error, err.localizedDescription)
+                Utils.otplessLog("Sending error: \(err.localizedDescription)")
                 completion(.err(NetworkError.other(err.localizedDescription)))
                 
             }
@@ -384,7 +384,7 @@ final class CellularConnectionManager: @unchecked Sendable {
         //Read the entire response body
         connection?.receive(minimumIncompleteLength: 1, maximumLength: 65536){ data, context, isComplete, error in
             
-            os_log("Receive isComplete: %s", isComplete.description)
+            Utils.otplessLog("Receive isComplete: \(isComplete.description)")
             if let err = error {
                 completion(.err(NetworkError.other(err.localizedDescription)))
                 return
@@ -392,10 +392,10 @@ final class CellularConnectionManager: @unchecked Sendable {
             
             if let d = data, !d.isEmpty, let response = self.decodeResponse(data: d) {
                 
-                os_log("Response:\n %s", response)
+                Utils.otplessLog("Response:\n \(response)")
                 
                 let status = self.parseHttpStatusCode(response: response)
-                os_log("\n----\nHTTP status: %s", String(status))
+                Utils.otplessLog("\n----\nHTTP status: \(status)")
                 
                 switch status {
                 case 200...202:
@@ -447,7 +447,7 @@ final class CellularConnectionManager: @unchecked Sendable {
                                 let c = response[r1.upperBound..<r2.lowerBound]
                                 if let start = c.firstIndex(of: "{") {
                                     let json = c[start..<c.index(c.endIndex, offsetBy: 0)]
-                                    os_log("json: %s",  String(json))
+                                    Utils.otplessLog("json: \(json)")
                                     let jsonString = String(json)
                                     guard let data = jsonString.data(using: .utf8) else {
                                         return nil
@@ -460,7 +460,7 @@ final class CellularConnectionManager: @unchecked Sendable {
                     let content = response[range.upperBound..<response.index(response.endIndex, offsetBy: 0)]
                     if let start = content.firstIndex(of: "{") {
                         let json = content[start..<response.index(response.endIndex, offsetBy: 0)]
-                        os_log("json: %s",  String(json))
+                        Utils.otplessLog("json: \(json)")
                         let jsonString = String(json)
                         guard let data = jsonString.data(using: .utf8) else {
                             return nil

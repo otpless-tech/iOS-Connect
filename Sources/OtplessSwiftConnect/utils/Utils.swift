@@ -114,6 +114,12 @@ final internal class Utils {
             return nil
         }
     }
-
     
+    static func otplessLog(_ message: String) {
+        #if DEBUG
+            if OtplessSwiftConnect.shared.shouldLog {
+                print("OtplessSwiftConnect: \(message)")
+            }
+        #endif
+    }
 }

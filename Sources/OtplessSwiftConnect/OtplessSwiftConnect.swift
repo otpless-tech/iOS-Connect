@@ -23,7 +23,7 @@ public class OtplessSwiftConnect: NSObject, URLSessionDelegate {
     private var roomRequestId: String = ""
     private var secret: String = ""
     
-    private var shouldLog = false
+    internal private(set) var shouldLog = false
     
     private var eventCounter = 1
     
@@ -67,40 +67,34 @@ public class OtplessSwiftConnect: NSObject, URLSessionDelegate {
     func setupSocketEvents() {
         guard let socket = socket else {
             sendEvent(event: .SOCKET_CONNECTION_FAILURE, extras: ["error": "Could not create Socket.IO client"])
-            os_log("OtplessConnect: Could not create socket connection")
+            Utils.otplessLog("OtplessConnect: Could not create socket connection")
             return
         }
         
-        socket.on(clientEvent: .connect) { [weak self] data, ack in
+        socket.on(clientEvent: .connect) { data, ack in
             sendEvent(event: .SOCKET_CONNECTION_SUCCESS)
-            if self?.shouldLog == true {
-                os_log("OtplessConnect: socket connected")
-            }
+            Utils.otplessLog("OtplessConnect: socket connected")
         }
         
-        socket.on(clientEvent: .disconnect) { [weak self] data, ack in
+        socket.on(clientEvent: .disconnect) { data, ack in
             sendEvent(event: .SOCKET_DISCONNECTED, extras: ["error": "Socket disconnected"])
-            if self?.shouldLog == true {
-                os_log("OtplessConnect: socket disconnected")
-            }
+            Utils.otplessLog("OtplessConnect: socket disconnected")
         }
         
-        socket.on(clientEvent: .error) { [weak self] data, ack in
+        socket.on(clientEvent: .error) { data, ack in
             sendEvent(event: .SOCKET_ERROR, extras: ["error": data.description])
-            if self?.shouldLog == true {
-                print("OtplessConnect: Socket error: \(data)")
-            }
+            Utils.otplessLog("OtplessConnect: Socket error: \(data)")
         }
         
-        socket.on(clientEvent: .reconnectAttempt) { [weak self] data, ack in
+        socket.on(clientEvent: .reconnectAttempt) { data, ack in
             sendEvent(event: .SOCKET_RECONNECT_ATTEMPT, extras: ["reconnectAttemptCount": data.description])
         }
         
-        socket.on(clientEvent: .statusChange) { [weak self] data, ack in
+        socket.on(clientEvent: .statusChange) { data, ack in
             sendEvent(event: .SOCKET_STATUS_CHANGE, extras: ["statusChangeData": data.description])
         }
         
-        socket.on(clientEvent: .websocketUpgrade) { [weak self] data, ack in
+        socket.on(clientEvent: .websocketUpgrade) { data, ack in
             sendEvent(event: .SOCKET_WEBSOCKET_UPGRADE)
         }
         
@@ -109,16 +103,14 @@ public class OtplessSwiftConnect: NSObject, URLSessionDelegate {
                 sendEvent(event: .SOCKET_MESSAGE_RECEIVED, extras: ["messageId": parsedEvent.messageId])
                 self?.handleParsedEvent(parsedEvent)
             } else {
-                sendEvent(event: .SOCKET_MESSAGE_RECEIVED, extras: ["error": "Failed to parse socket message: \(Utils.jsonParamString(from: data))"])
-                if self?.shouldLog == true {
-                    print("OtplessConnect: Failed to parse event \(data)")
-                }
+                sendEvent(event: .SOCKET_MESSAGE_RECEIVED, extras: ["error": "Failed to parse socket message: \(Utils.jsonParamString(from: data) ?? "")"])
+                Utils.otplessLog("OtplessConnect: Failed to parse event \(data)")
             }
         }
     }
     
     
-    public func getStartParams() -> [String: Any] {
+    public func startOtpless() -> [String: Any] {
         var params: [String: Any] = [:]
         params["otpless_connect_id"] = roomRequestId
         params["v"] = 5
@@ -137,6 +129,7 @@ public class OtplessSwiftConnect: NSObject, URLSessionDelegate {
         roomRequestId = ""
         roomRequestToken = ""
         secret = ""
+        appId = ""
         sendEvent(event: .STOP_CONNECT)
     }
     
@@ -151,7 +144,7 @@ extension OtplessSwiftConnect {
         let socketUrl = URL(string: "https://connect.otpless.app/?token=\(self.roomRequestId)")
         guard let socketUrl = socketUrl else {
             sendEvent(event: .SOCKET_CONNECTION_FAILURE, extras: ["error": "Socket URL could not be parsed."])
-            os_log("Could not create socket url")
+            Utils.otplessLog("Could not create socket url")
             return
         }
         self.socketManager = SocketManager(
@@ -170,14 +163,14 @@ extension OtplessSwiftConnect {
         socketManager?.reconnect()
         guard let socketManager = self.socketManager else {
             sendEvent(event: .SOCKET_CONNECTION_FAILURE, extras: ["error": "SocketManager could not be created."])
-            os_log("Could not create socket manager")
+            Utils.otplessLog("Could not create socket manager")
             return
         }
         self.socket = socketManager.defaultSocket
         
         guard let socket = self.socket else {
             sendEvent(event: .SOCKET_CONNECTION_FAILURE, extras: ["error": "Could not create socket."])
-            os_log("Could not create socket")
+            Utils.otplessLog("Could not create socket")
             return
         }
         socket.connect()

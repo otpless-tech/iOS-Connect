@@ -52,7 +52,7 @@ private struct RoomTokenRequestBody: Codable, Sendable {
                 return jsonObject
             }
         } catch {
-            print("Error converting to dictionary: \(error)")
+            Utils.otplessLog("Error converting to dictionary: \(error)")
         }
         return [:]
     }
