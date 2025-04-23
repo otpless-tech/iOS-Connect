@@ -92,14 +92,6 @@ public class OtplessSwiftConnect: NSObject, URLSessionDelegate {
             }
         }
         
-        socket.on(clientEvent: .ping) { [weak self] data, ack in
-            sendEvent(event: .SOCKET_PING)
-        }
-        
-        socket.on(clientEvent: .pong) { [weak self] data, ack in
-            sendEvent(event: .SOCKET_PONG)
-        }
-        
         socket.on(clientEvent: .reconnectAttempt) { [weak self] data, ack in
             sendEvent(event: .SOCKET_RECONNECT_ATTEMPT, extras: ["reconnectAttemptCount": data.description])
         }
