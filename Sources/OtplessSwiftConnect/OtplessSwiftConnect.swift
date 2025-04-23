@@ -86,10 +86,30 @@ public class OtplessSwiftConnect: NSObject, URLSessionDelegate {
         }
         
         socket.on(clientEvent: .error) { [weak self] data, ack in
-            sendEvent(event: .SOCKET_ERROR, extras: ["error": Utils.jsonParamString(from: data) ?? "Unknown error or error could not be parsed from Socket"])
+            sendEvent(event: .SOCKET_ERROR, extras: ["error": data.description])
             if self?.shouldLog == true {
                 print("OtplessConnect: Socket error: \(data)")
             }
+        }
+        
+        socket.on(clientEvent: .ping) { [weak self] data, ack in
+            sendEvent(event: .SOCKET_PING)
+        }
+        
+        socket.on(clientEvent: .pong) { [weak self] data, ack in
+            sendEvent(event: .SOCKET_PONG)
+        }
+        
+        socket.on(clientEvent: .reconnectAttempt) { [weak self] data, ack in
+            sendEvent(event: .SOCKET_RECONNECT_ATTEMPT, extras: ["reconnectAttemptCount": data.description])
+        }
+        
+        socket.on(clientEvent: .statusChange) { [weak self] data, ack in
+            sendEvent(event: .SOCKET_STATUS_CHANGE, extras: ["statusChangeData": data.description])
+        }
+        
+        socket.on(clientEvent: .websocketUpgrade) { [weak self] data, ack in
+            sendEvent(event: .SOCKET_WEBSOCKET_UPGRADE)
         }
         
         socket.on("message") { [weak self] (data, ack) in
